@@ -453,7 +453,7 @@ async function go(){
   S.cd=30;if(b){b.disabled=false;b.textContent='🔄 새로고침';}if($('lastU'))$('lastU').textContent=new Date().toLocaleTimeString('ko-KR');
   uD();uP();uStk();
   fetchRebase().then(renderRebase).catch(function(){});
-  fetchSellTax().then(renderTax).catch(function(){});
+  fetchSellTax().then(function(){renderTax();if(!window._taxOnce){window._taxOnce=1;rL();}}).catch(function(){});
 }
 
 // ─── charts ───
@@ -630,18 +630,20 @@ function clr(){if(!confirm('기록을 모두 삭제할까요?'))return;S.ledger=
 function toggleRec(i){const rows=document.querySelectorAll('#lB tr[data-r="'+i+'"]');let hid=true;rows.forEach(r=>{r.classList.toggle('hid');hid=r.classList.contains('hid');});const c=$('rc-'+i);if(c)c.textContent=hid?'▸':'▾';}
 function rL(){const tb=$('lB');if(!tb)return;const n=S.ledger.length;if($('lC'))$('lC').textContent=n;if($('bCl'))$('bCl').classList.toggle('hid',n===0);
   if(!n){tb.innerHTML='<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--text-faint)">아직 기록이 없습니다.</td></tr>';return;}
-  const net=(v,t)=>v*(1-((t||0)/100));
+  const liveTax={poly:(S.poly&&+S.poly.sellTax)||0,anu:(S.anu&&+S.anu.sellTax)||0};
+  const eff=it=>(it.tax&&it.tax>0)?it.tax:(liveTax[it.chain]||0);   // 기록 tax 없으면(로드前 기록 등) 현재 매도세 폴백
+  const net=(v,it)=>v*(1-(eff(it)/100));
   let h='';
   for(let i=n-1;i>=0;i--){const r=S.ledger[i];const items=(r.items||[]);
-    let sH=0,sU=0,sK=0,sNU=0,sNK=0;items.forEach(it=>{sH+=it.h||0;sU+=it.vU||0;sK+=it.vK||0;sNU+=net(it.vU||0,it.tax);sNK+=net(it.vK||0,it.tax);});
+    let sH=0,sU=0,sK=0,sNU=0,sNK=0;items.forEach(it=>{sH+=it.h||0;sU+=it.vU||0;sK+=it.vK||0;sNU+=net(it.vU||0,it);sNK+=net(it.vK||0,it);});
     h+=`<tr style="cursor:pointer" onclick="toggleRec(${i})" title="펼치기/접기"><td><span id="rc-${i}" style="color:var(--neon)">▸</span></td>`
       +`<td style="white-space:nowrap;font-size:10px">${r.d}</td><td>${fN(sH,2)}</td>`
       +`<td class="cg">${f$(sU)}</td><td class="co">${f$(sNU)}</td><td class="cg">${fW(sK)}</td><td class="co">${fW(sNK)}</td></tr>`;
     items.forEach(it=>{const cn=it.chain==='anu'?'𓁢 ANU':'⬡ POL';const cl=it.chain==='anu'?'ca':'cg';
       h+=`<tr class="hid" data-r="${i}" style="background:rgba(159,232,112,.03)"><td style="color:var(--text-faint)">└</td>`
-        +`<td class="${cl}" style="white-space:nowrap">${cn} <span style="color:var(--text-faint);font-size:9px">매도세 ${fN(it.tax||0,2)}%</span></td>`
+        +`<td class="${cl}" style="white-space:nowrap">${cn} <span style="color:var(--text-faint);font-size:9px">매도세 ${(it.tax&&it.tax>0)?'':'~'}${fN(eff(it),2)}%</span></td>`
         +`<td>${fN(it.h,2)}<div style="font-size:9px;color:var(--text-faint)">@${f$(it.p)} · ₩${fN(it.fx,0)}</div></td>`
-        +`<td>${f$(it.vU)}</td><td class="co">${f$(net(it.vU,it.tax))}</td><td>${fW(it.vK)}</td><td class="co">${fW(net(it.vK,it.tax))}</td></tr>`;});
+        +`<td>${f$(it.vU)}</td><td class="co">${f$(net(it.vU,it))}</td><td>${fW(it.vK)}</td><td class="co">${fW(net(it.vK,it))}</td></tr>`;});
   }
   tb.innerHTML=h;}
 
