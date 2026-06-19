@@ -527,7 +527,7 @@ function setAsset(sfx,v,hold){$('h'+sfx).textContent=fN(hold,2);$('v'+sfx).textC
 
 function sStk(){S.stkQ=pf($('stkQ').value);S.stkW=pf($('stkW').value);try{localStorage.setItem('sq',S.stkQ);localStorage.setItem('sw',S.stkW);}catch(e){}uStk();}
 function uStk(){const el=$('stkRes');if(!S.stkQ||!S.poly.price){el.innerHTML='';return;}
-  const curQ=S.assets.poly.hold||S.stkQ;const fx=S.fx.live||0;const price=S.poly.price;
+  const curQ=S.assets.poly.hold||S.stkQ;const fx=bestFx();const price=S.poly.price;
   const curValU=curQ*price,curValK=curValU*fx;const earnedQ=curQ-S.stkQ;
   const pctQ=S.stkQ>0?((curQ-S.stkQ)/S.stkQ)*100:0;const pctK=S.stkW>0?((curValK-S.stkW)/S.stkW)*100:0;
   el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;text-align:center">
@@ -621,7 +621,10 @@ function renderWallets(){const el=$('wList');if(!el)return;const ab=$('wAllBtn')
   }).join('');}
 
 function nowStr(){return new Date().toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});}
-function rec(){if(!S.poly.price&&!S.anu.price)return;const fx=S.fx.live||0;const items=[];
+function bestFx(){var lv=+(S.fx&&S.fx.live)||0,off=+(S.fx&&S.fx.off)||0,fx=lv||off;   // 환율 폴백: 업비트(live)→공시(off)→직전 정상값
+  if(fx>0){try{localStorage.setItem('lastFx',String(fx));}catch(e){}return fx;}
+  return +(localStorage.getItem('lastFx'))||0;}
+function rec(){if(!S.poly.price&&!S.anu.price)return;const fx=bestFx();const items=[];
   [['poly',S.poly.price,S.assets.poly.hold,S.poly.sellTax],['anu',S.anu.price,S.assets.anu.hold,S.anu.sellTax]].forEach(([chain,price,hold,tax])=>{
     if(!price)return;const vU=hold*price,vK=vU*fx;items.push({chain,p:price,fx,h:hold,vU,vK,tax:(tax!=null&&!isNaN(tax))?tax:0});});
   if(!items.length)return;
@@ -634,7 +637,7 @@ function rL(){const tb=$('lB');if(!tb)return;S._exp=S._exp||{};const n=S.ledger.
   if(!n){tb.innerHTML='<tr><td colspan="7" style="padding:40px;text-align:center;color:var(--text-faint)">아직 기록이 없습니다.</td></tr>';return;}
   // 실수령 = 현재 라이브 매도세 기준("지금 팔면", 운영자 가변). KRW = 기록시점 환율(없으면 현재).
   const liveTax={poly:(S.poly&&+S.poly.sellTax)||0,anu:(S.anu&&+S.anu.sellTax)||0};
-  const liveFx=(S.fx&&+S.fx.live)||0;
+  const liveFx=bestFx();
   const curTax=it=>(liveTax[it.chain]>0?liveTax[it.chain]:(it.tax||0));
   const effFx=it=>(it.fx&&it.fx>0)?it.fx:liveFx;
   const usdNet=it=>(it.vU||0)*(1-curTax(it)/100);
