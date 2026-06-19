@@ -1,6 +1,6 @@
 /* Origin LGNS Tracker PWA service worker — 앱 셸 캐시(설치형 PWA) + network-first.
    외부 RPC/API/CDN/DexTools/iframe(rates 내부 호출 포함)은 통과(캐시 안 함). */
-const CACHE = 'lgns-tracker-shell-v2';
+const CACHE = 'lgns-tracker-shell-v3';
 const SHELL = [
   './', './index.html', './rates.html', './dashboard.html',
   './manifest.json', './dashboard.webmanifest',
@@ -29,8 +29,11 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   // 앱 셸(같은 출처)만 network-first→cache 폴백. 외부 API/RPC/DexTools/폰트는 그대로 통과.
   if (url.origin === location.origin && e.request.method === 'GET') {
+    // HTML/네비게이션은 HTTP 캐시 우회(cache:'reload')로 항상 최신 — 업데이트 즉시 반영(stale 방지).
+    const isHTML = e.request.mode === 'navigate' || /\.html$/.test(url.pathname) || url.pathname.endsWith('/');
+    const req = isHTML ? new Request(e.request.url, { cache: 'reload' }) : e.request;
     e.respondWith(
-      fetch(e.request)
+      fetch(req)
         .then((r) => { const cp = r.clone(); caches.open(CACHE).then((c) => c.put(e.request, cp)); return r; })
         .catch(() => caches.match(e.request).then((m) => m || caches.match('./index.html')))
     );
