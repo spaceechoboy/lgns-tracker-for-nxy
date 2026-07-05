@@ -290,6 +290,21 @@ tr:hover td{background:rgba(159,232,112,.03)}
     <thead><tr><th></th><th>날짜 / 체인</th><th>수량</th><th>USD</th><th>실수령 $</th><th>KRW</th><th>실수령 ₩</th></tr></thead>
     <tbody id="lB"><tr><td colspan="7" style="padding:40px;text-align:center;color:var(--text-faint)">아직 기록이 없습니다.</td></tr></tbody>
   </table></div></div>
+
+  <!-- ── 체인별 보유 도넛 (자체 지갑 추가 · 통합 표시) ── -->
+  <div class="card" style="margin-top:14px"><div class="card-head"><span class="card-title">🍩 체인별 보유 구성</span></div>
+    <div class="card-body">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        <input type="text" class="ifl" id="dwAddr" placeholder="0x… 지갑 주소" spellcheck="false" autocapitalize="off" style="flex:2;min-width:200px;font-size:14px" onkeydown="if(event.key==='Enter')dwAdd()">
+        <input type="text" class="ifl" id="dwLabel" placeholder="별칭(선택)" style="flex:1;min-width:90px;font-size:14px" onkeydown="if(event.key==='Enter')dwAdd()">
+        <button class="br" onclick="dwAdd()">＋ 지갑 추가</button>
+      </div>
+      <div class="hint" id="dwStat" style="margin:0 0 8px">지갑 주소를 추가하면 온체인 보유(리베이스·해제분·추가이자 포함, Dapp 정합)를 조회해 체인별로 통합 표시합니다.</div>
+      <div id="dwList"></div>
+      <div id="donutWrap" style="display:none;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:10px"></div>
+      <div class="hint" id="donutNote" style="display:none;text-align:center;margin-top:6px">⚠ 체인 간 LGNS는 별개 토큰 — 명목 합산 · 여러 지갑 합계</div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══ 이율 (rates.html 임베드 — 스크립트 격리) ═══ -->
@@ -547,36 +562,49 @@ function uStk(){const el=$('stkRes');if(!S.stkQ||!S.poly.price){el.innerHTML='';
 const W={ pSL:SLGNS, pLG:POLY_LGNS,
   pLong:['0x8cA97F41d2C81AF050656e8AD0Cf543820a24504','0x6652d0f0D7aEc5070804E55b7023d32B9Bbc4190','0x25a4b842cB200E9148FF5a11BAbF80488c8d8b07'],
   aSL:'0x2243aE29F73137d678197b61B0621AE942845B8C', aLG:ANU_LGNS,
-  aLong:['0x88ea98af226Cd4402A3873400308a4D78784eCE6','0x04eD22c6d1D020A9B5e032E93D79ab28293EF72f'] };
-const SEL_BAL='0x70a08231',SEL_CNT='0x98dc8dea',SEL_STK='0x584b62a1',SEL_BFG='0x7965d56d',SEL_XTRA='0xb01d3563';
+  aLong:['0x88ea98af226Cd4402A3873400308a4D78784eCE6','0x04eD22c6d1D020A9B5e032E93D79ab28293EF72f','0x1e5fEEc473f7F445fc7F5fEEC0bEABB2270b0B4E'],
+  aFlex:'0xf7788f5a5cbbafac4120c63c79dcd9f1931c7824', aComm:'0xf7a0cacdf0810609ee5618247c4121b799e41664' };
+const SEL_BAL='0x70a08231',SEL_CNT='0x98dc8dea',SEL_STK='0x584b62a1',SEL_BFG='0x7965d56d',SEL_XTRA='0xb01d3563',SEL_PP='0xda709204',SEL_FLEXT='0xb79215d6',SEL_COMM='0x402914f5';
 function enc32(a){return a.toLowerCase().replace('0x','').padStart(64,'0');}
 function i32(i){return BigInt(i).toString(16).padStart(64,'0');}
 function wWord(hex,i){const h=hex.replace(/^0x/,'');return '0x'+h.slice(i*64,i*64+64);}
 function hxN(hex){if(!hex||hex==='0x')return 0;try{const v=Number(BigInt(hex.slice(0,66)))/1e9;return (v>=0&&v<1e12)?v:0;}catch(e){return 0;}}
 async function pcall(to,data){for(const u of POLY_RPC){try{const r=await polyRpc(u,'eth_call',[{to,data},'latest']);if(r)return r;}catch(e){}}return null;}
 async function acall(to,data){try{const r=await fetch(ANU_RPC,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_call',params:[{to,data},'latest']})});const j=await r.json();return j.result||null;}catch(e){return null;}}
-async function longSum(callFn,contract,w,viaBFG){
+// long 스테이킹 현재가치 = balanceForGons(원금+리베이스) + pendingPayout(미청구 해제분) + extraInterest.
+// 양 체인 동일 모델(origin-console 검증: Anubis=Polygon 동일 셀렉터). bfg는 해당 체인 sLGNS로 호출.
+// 미구현 getter는 revert→null→hxN=0로 안전 폴백. (2026-07-05 Dapp 격차 851=Anubis 리베이스 누락 수정)
+async function longSum(callFn,contract,slgns,w){
   const c=await callFn(contract,SEL_CNT+enc32(w));const cnt=c?Number(BigInt(c.slice(0,66))):0;
-  if(!cnt||cnt>500)return 0;const lim=Math.min(cnt,80);
-  const arr=await Promise.all(Array.from({length:lim},(_,i)=>callFn(contract,SEL_STK+enc32(w)+i32(i))));
+  if(!cnt||cnt>500)return 0;const lim=Math.min(cnt,200);
+  const idxs=Array.from({length:lim},(_,i)=>i);
+  const stakes=await Promise.all(idxs.map(i=>callFn(contract,SEL_STK+enc32(w)+i32(i))));
   let sum=0;
-  for(let i=0;i<arr.length;i++){const r=arr[i];if(!r||r.length<2+8*64)continue;
-    if(BigInt(wWord(r,7))!==1n)continue;                          // active 플래그(word7)
+  await Promise.all(idxs.map(async i=>{
+    const r=stakes[i];if(!r||r.length<2+8*64)return;
+    if(BigInt(wWord(r,7))!==1n)return;                            // active 플래그(word7)
     const principal=Number(BigInt(wWord(r,0)))/1e9;
-    if(viaBFG){const b=await pcall(W.pSL,SEL_BFG+wWord(r,1).slice(2));const v=hxN(b);sum+=v||principal;}  // Polygon=balanceForGons 현재가치
-    else{const xr=await acall(contract,SEL_XTRA+enc32(w)+i32(i));sum+=principal+hxN(xr);}                 // Anubis=원금+extraInterest
-  }
+    const gons=wWord(r,1).slice(2);
+    const [b,pp,xr]=await Promise.all([
+      callFn(slgns,SEL_BFG+gons),                                 // balanceForGons(원금+리베이스, 해당 체인 sLGNS)
+      callFn(contract,SEL_PP+enc32(w)+i32(i)),                    // pendingPayout(미청구 해제분)
+      callFn(contract,SEL_XTRA+enc32(w)+i32(i))                   // extraInterest(추가이자)
+    ]);
+    sum+=(hxN(b)||principal)+hxN(pp)+hxN(xr);
+  }));
   return sum;
 }
 async function readWallet(w){
-  const [pLg,pSl,pL0,pL1,pL2,aLg,aSl,aL0,aL1]=await Promise.all([
+  const [pLg,pSl,pL0,pL1,pL2,aLg,aSl,aL0,aL1,aL2,aFlex,aComm]=await Promise.all([
     pcall(W.pLG,SEL_BAL+enc32(w)).then(hxN), pcall(W.pSL,SEL_BAL+enc32(w)).then(hxN),
-    longSum(pcall,W.pLong[0],w,true), longSum(pcall,W.pLong[1],w,true), longSum(pcall,W.pLong[2],w,true),
+    longSum(pcall,W.pLong[0],W.pSL,w), longSum(pcall,W.pLong[1],W.pSL,w), longSum(pcall,W.pLong[2],W.pSL,w),
     acall(W.aLG,SEL_BAL+enc32(w)).then(hxN), acall(W.aSL,SEL_BAL+enc32(w)).then(hxN),
-    longSum(acall,W.aLong[0],w,false), longSum(acall,W.aLong[1],w,false)
+    longSum(acall,W.aLong[0],W.aSL,w), longSum(acall,W.aLong[1],W.aSL,w), longSum(acall,W.aLong[2],W.aSL,w),
+    acall(W.aFlex,SEL_FLEXT+enc32(w)).then(hxN), acall(W.aComm,SEL_COMM+enc32(w)).then(hxN)   // Anubis 유동스테이킹 + 커뮤니티 리워드
   ]);
-  const pLong=pL0+pL1+pL2, aLong=aL0+aL1;
-  return {lgns:{p:pLg,a:aLg},slgns:{p:pSl,a:aSl},long:{p:pLong,a:aLong},p:pLg+pSl+pLong,a:aLg+aSl+aLong};
+  const pLong=pL0+pL1+pL2, aLong=aL0+aL1+aL2;
+  return {lgns:{p:pLg,a:aLg},slgns:{p:pSl,a:aSl},long:{p:pLong,a:aLong},flex:aFlex,comm:aComm,
+    p:pLg+pSl+pLong, a:aLg+aSl+aLong+aFlex+aComm};
 }
 function saveWallets(){try{localStorage.setItem('wallets',JSON.stringify(S.wallets.map(w=>({addr:w.addr,label:w.label}))));}catch(e){}}
 function addWallet(){const addr=($('wAddr').value||'').trim(),label=($('wLabel').value||'').trim();
@@ -595,6 +623,51 @@ function aggregate(){let p=0,a=0;(S.wallets||[]).forEach(w=>{p+=w.p||0;a+=w.a||0
   const ag=$('wAgg');if(ag){ag.style.display=(S.wallets&&S.wallets.length)?'':'none';$('agP').textContent=fN(p,4)+' LGNS';$('agA').textContent=fN(a,4)+' LGNS';$('agT').textContent=fN(p+a,4)+' LGNS';}
   $('iH_poly').value=p?Math.round(p*1e4)/1e4:'';$('iH_anu').value=a?Math.round(a*1e4)/1e4:'';uP();
   if($('wStat'))$('wStat').textContent=(S.wallets&&S.wallets.length)?('✅ 지갑 '+S.wallets.length+'개 · 합계 반영 · ⠿ 드래그 또는 ↑/↓로 정렬'):'지갑을 추가하면 온체인 보유를 조회해 모두 합산합니다. (목록·순서 자동 저장)';}
+
+// ═══ 기록 탭 하단 — 체인별 보유 도넛(자체 지갑 목록·통합). 자산 탭과 독립. readWallet 재사용(Dapp 정합). ═══
+function dwSave(){try{localStorage.setItem('donutWallets',JSON.stringify((S.dWallets||[]).map(w=>({addr:w.addr,label:w.label}))));}catch(e){}}
+function dwAdd(){const addr=($('dwAddr').value||'').trim(),label=($('dwLabel').value||'').trim();
+  if(!/^0x[0-9a-fA-F]{40}$/.test(addr)){$('dwStat').textContent='⚠ 올바른 0x 지갑 주소를 입력하세요.';return;}
+  if(!S.dWallets)S.dWallets=[];
+  if(S.dWallets.some(x=>x.addr.toLowerCase()===addr.toLowerCase())){$('dwStat').textContent='⚠ 이미 추가된 지갑입니다.';return;}
+  S.dWallets.push({addr,label,p:0,a:0,br:null,done:false,loading:false});dwSave();
+  $('dwAddr').value='';$('dwLabel').value='';dwRender();dwFetchAt(S.dWallets.length-1);}
+function dwRemove(i){S.dWallets.splice(i,1);dwSave();dwRender();}
+async function dwFetchAt(i){const w=S.dWallets[i];if(!w)return;w.loading=true;w.err=null;dwRender();
+  try{const r=await readWallet(w.addr);w.br=r;w.p=r.p;w.a=r.a;w.done=true;}catch(e){w.err=((e&&e.message)||e);}
+  w.loading=false;dwRender();}
+function dwRender(){
+  const el=$('dwList');if(!el)return;
+  el.innerHTML=(S.dWallets||[]).map((w,i)=>{
+    const sh=w.addr.slice(0,6)+'…'+w.addr.slice(-4);
+    const st=w.loading?'<span class="cdm">조회중…</span>':(w.err?'<span class="cr">실패</span>':(w.done?'<span class="cg">'+fN(w.p,2)+'</span> ⬡ / <span class="ca">'+fN(w.a,2)+'</span> 𓁢 LGNS':'<span class="cdm">대기</span>'));
+    return '<div class="card" style="margin:0 0 8px"><div class="card-body" style="padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
+      +'<span>'+(w.label?'<b>'+w.label.replace(/</g,'&lt;')+'</b> · ':'')+'<span class="mono cdm" style="font-size:12px">'+sh+'</span></span>'
+      +'<div style="display:flex;align-items:center;gap:6px"><span class="mono" style="font-size:13px">'+st+'</span>'
+      +'<button class="btn" style="padding:3px 9px;font-size:12px" title="새로고침" onclick="dwFetchAt('+i+')">↻</button>'
+      +'<button class="bc" style="padding:3px 9px;font-size:12px" title="삭제" onclick="dwRemove('+i+')">✕</button></div></div></div>';
+  }).join('');
+  const has=S.dWallets&&S.dWallets.length;
+  $('dwStat').textContent=has?('✅ 지갑 '+S.dWallets.length+'개 · 온체인 보유 통합(리베이스·해제분·추가이자 포함, Dapp 정합)'):'지갑 주소를 추가하면 온체인 보유(리베이스·해제분·추가이자 포함, Dapp 정합)를 조회해 체인별로 통합 표시합니다.';
+  drawDonut();
+}
+// 도넛 = 추가된 지갑 전체의 체인별 합계(Polygon vs Anubis). origin-summary 도넛 이식.
+function drawDonut(){
+  const wrap=$('donutWrap'),note=$('donutNote');if(!wrap)return;
+  let p=0,a=0;(S.dWallets||[]).forEach(w=>{if(w.done){p+=w.p||0;a+=w.a||0;}});
+  const tot=p+a;
+  if(tot<=0){wrap.style.display='none';if(note)note.style.display='none';return;}
+  wrap.style.display='flex';if(note)note.style.display='';
+  const data=[{name:'Polygon',v:p,color:'#EB4323'},{name:'Anubis',v:a,color:'#9FE870'}].filter(s=>s.v>0);
+  const C=439.8;let off=0,segs='';
+  data.forEach(s=>{const len=s.v/tot*C;
+    segs+='<circle cx="90" cy="90" r="70" fill="none" stroke="'+s.color+'" stroke-width="22" stroke-dasharray="'+len.toFixed(1)+' '+C.toFixed(1)+'" stroke-dashoffset="'+(-off).toFixed(1)+'" transform="rotate(-90 90 90)"/>';off+=len;});
+  const svg='<svg viewBox="0 0 180 180" width="150" height="150" aria-label="체인별 보유 도넛"><circle cx="90" cy="90" r="70" fill="none" stroke="#17231a" stroke-width="22"/>'+segs+
+    '<text x="90" y="84" text-anchor="middle" fill="#E8F5E0" font-size="16" font-weight="800">'+fN(tot,0)+'</text>'+
+    '<text x="90" y="103" text-anchor="middle" fill="#6B7569" font-size="9">LGNS · 명목합</text></svg>';
+  const lgd=data.map(s=>'<div style="display:flex;align-items:center;gap:8px;padding:3px 0"><span style="width:11px;height:11px;border-radius:3px;background:'+s.color+';display:inline-block;flex:0 0 auto"></span><span style="min-width:64px">'+s.name+'</span><b class="mono">'+fN(s.v,2)+'</b><span style="color:var(--text-faint);margin-left:6px">'+(tot?(s.v/tot*100).toFixed(1):0)+'%</span></div>').join('');
+  wrap.innerHTML='<div>'+svg+'</div><div style="flex:1 1 220px;min-width:200px">'+lgd+'</div>';
+}
 // ── 지갑 수동 정렬: 드래그(데스크톱) + ↑/↓(모바일·정밀). 순서 자동 저장 ──
 let _wDrag=-1;
 function wDragStart(e,i){_wDrag=i;try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(i));}catch(_){}}
@@ -608,7 +681,8 @@ function renderWallets(){const el=$('wList');if(!el)return;const ab=$('wAllBtn')
   el.innerHTML=S.wallets.map((w,i)=>{
     const sh=w.addr.slice(0,6)+'…'+w.addr.slice(-4);
     const st=w.loading?'<span class="cdm">조회중…</span>':(w.err?'<span class="cr">실패</span>':(w.done?'<span class="cg">'+fN(w.p,2)+'</span> / <span class="ca">'+fN(w.a,2)+'</span> LGNS':'<span class="cdm">대기</span>'));
-    const br=w.br?('<div class="hint" style="margin-top:4px">⬡ 유동 '+fN(w.br.lgns.p,2)+' · sLGNS '+fN(w.br.slgns.p,2)+' · 장기 '+fN(w.br.long.p,2)+' &nbsp;|&nbsp; 𓁢 유동 '+fN(w.br.lgns.a,2)+' · sLGNS '+fN(w.br.slgns.a,2)+' · 장기 '+fN(w.br.long.a,2)+'</div>'):'';
+    const anuExtra=(w.br&&w.br.flex?' · 유동스테이킹 '+fN(w.br.flex,2):'')+(w.br&&w.br.comm?' · 리워드 '+fN(w.br.comm,2):'');
+    const br=w.br?('<div class="hint" style="margin-top:4px">⬡ 유동 '+fN(w.br.lgns.p,2)+' · sLGNS '+fN(w.br.slgns.p,2)+' · 장기 '+fN(w.br.long.p,2)+' &nbsp;|&nbsp; 𓁢 유동 '+fN(w.br.lgns.a,2)+' · sLGNS '+fN(w.br.slgns.a,2)+' · 장기 '+fN(w.br.long.a,2)+anuExtra+'</div>'):'';
     return '<div class="card" draggable="true" ondragstart="wDragStart(event,'+i+')" ondragover="wDragOver(event)" ondrop="wDrop(event,'+i+')" ondragend="wDragEnd()" style="margin:0 0 8px;cursor:grab"><div class="card-body" style="padding:10px 14px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
       +'<div style="display:flex;align-items:center;gap:7px;min-width:0"><span title="드래그로 정렬" style="color:var(--text-faint);cursor:grab;user-select:none;font-size:14px">⠿</span><span>'+(w.label?'<b>'+w.label.replace(/</g,'&lt;')+'</b> · ':'')+'<span class="mono cdm" style="font-size:12px">'+sh+'</span></span></div>'
@@ -659,6 +733,7 @@ function rL(){const tb=$('lB');if(!tb)return;S._exp=S._exp||{};const n=S.ledger.
 
 function sw(t){document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('on',e.dataset.t===t));['s','a','r','y','i'].forEach(k=>$('t-'+k).classList.toggle('hid',k!==t));
   if(t==='s'){mountCharts();}
+  if(t==='r'){dwRender();}
   if(t==='y'){const f=$('ratesFrame');if(f&&f.dataset.src&&f.src.indexOf('rates.html')<0)f.src=f.dataset.src;}}
 
 function ld(){try{
@@ -677,7 +752,10 @@ function ld(){try{
   var _wl=[];try{_wl=JSON.parse(localStorage.getItem('wallets')||'[]')||[];}catch(e){_wl=[];}
   if(!_wl.length){var _old=localStorage.getItem('wAddr');if(_old&&/^0x[0-9a-fA-F]{40}$/.test(_old))_wl=[{addr:_old,label:''}];}
   S.wallets=_wl.map(function(x){return {addr:x.addr,label:x.label||'',p:0,a:0,br:null,done:false,loading:false};});
-  renderWallets();if(S.wallets.length)fetchAllWallets();}
+  renderWallets();if(S.wallets.length)fetchAllWallets();
+  var _dw=[];try{_dw=JSON.parse(localStorage.getItem('donutWallets')||'[]')||[];}catch(e){_dw=[];}
+  S.dWallets=_dw.map(function(x){return {addr:x.addr,label:x.label||'',p:0,a:0,br:null,done:false,loading:false};});
+  dwRender();S.dWallets.forEach(function(_,i){dwFetchAt(i);});}
 
 setInterval(()=>{S.cd=Math.max(0,S.cd-1);if($('cd'))$('cd').textContent=`(${S.cd}s)`;},1000);
 setInterval(go,30000);
