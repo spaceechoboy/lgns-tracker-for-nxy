@@ -1,6 +1,6 @@
 /* Origin LGNS Tracker PWA service worker — 앱 셸 캐시(설치형 PWA) + network-first.
    외부 RPC/API/CDN/DexTools/iframe(rates 내부 호출 포함)은 통과(캐시 안 함). */
-const CACHE = 'lgns-tracker-shell-v3';
+const CACHE = 'lgns-tracker-shell-v4';
 const SHELL = [
   './', './index.html', './rates.html', './dashboard.html',
   './manifest.json', './dashboard.webmanifest',

@@ -21,7 +21,7 @@
   box-shadow:0 0 16px rgba(159,232,112,.30);
 }
 .nav-tab:not(.active){color:var(--text-dim);border:1px solid var(--border-strong)}
-.nav-tab:not(.active):hover{color:var(--neon);border-color:var(--neon)}
+.nav-tab:not(.active):hover{color:var(--neon);border-color:var(--gold,#E8C547)}
 
 /* ── 시그니처(각인) — 우측 하단, 아주 작게, 거의 안 보이게 ── */
 .signature{

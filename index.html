@@ -12,7 +12,7 @@
 :root{
   --bg-0:#050805; --bg-1:#0a1109; --bg-2:#0f1a0e;
   --bg-card:#0e1610; --bg-card-2:#121f12;
-  --border:rgba(159,232,112,.18); --border-strong:rgba(159,232,112,.35);
+  --border:rgba(232,197,71,.32); --border-strong:rgba(232,197,71,.58);
   --neon:#9FE870; --neon-bright:#B5FF7D; --neon-dim:#6BB048;
   --text:#E8F5E0; --text-dim:#9CA89A; --text-faint:#6B7569;
   --danger:#FF6B6B; --warn:#FFB84D; --note:#6BB048;
@@ -32,26 +32,23 @@ body{min-height:100vh;background:radial-gradient(ellipse 1200px 600px at 50% -20
 .tabs{display:flex;gap:2px;overflow-x:auto}
 .tab{padding:9px 18px;border:none;background:0 0;color:var(--text-faint);font-weight:400;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;border-radius:8px 8px 0 0;font-family:inherit;transition:.2s;white-space:nowrap}
 .tab:hover{color:var(--text-dim)}
-.tab.on{background:var(--bg-card-2);color:var(--neon);font-weight:700;border-bottom-color:var(--neon)}
+.tab.on{background:var(--bg-card-2);color:var(--neon);font-weight:700;border-bottom-color:var(--gold)}
 .wrap{max-width:980px;margin:0 auto;padding:16px 24px 80px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.card,.cd{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s;margin-bottom:12px}
-.card:hover,.cd:hover{border-color:var(--border-strong)}
+.card,.cd{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s;margin-bottom:12px;box-shadow:0 0 16px rgba(232,197,71,.07)}
+.card:hover,.cd:hover{border-color:var(--border-strong);box-shadow:0 0 26px rgba(232,197,71,.16)}
 .card-head,.ch{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,rgba(159,232,112,.05),transparent 70%)}
 .card-title,.ct2{font-size:13px;font-weight:700;color:var(--text-dim)}
 .card-sub,.cs{font-size:10px;color:var(--text-faint)}
 .card-body,.cb{padding:16px 18px}
-.price-hero,.ph{background:var(--bg-card);border-radius:16px;padding:22px 26px;margin-bottom:12px;border:1px solid var(--border);background-image:linear-gradient(135deg,rgba(159,232,112,.05),transparent 60%);position:relative;overflow:hidden}
+.price-hero,.ph{background:var(--bg-card);border-radius:16px;padding:22px 26px;margin-bottom:12px;border:1px solid var(--border);background-image:linear-gradient(135deg,rgba(159,232,112,.05),transparent 60%);position:relative;overflow:hidden;box-shadow:0 0 20px rgba(232,197,71,.08)}
 .hero-tag{font-size:12px;color:var(--text-dim);letter-spacing:.04em;margin-bottom:6px}
 .pm{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
 .pv{font-family:var(--mono);font-size:36px;font-weight:900;color:#fff;line-height:1;text-shadow:0 0 24px rgba(159,232,112,.25)}
 .pc{font-size:15px;font-weight:700}
 .pmt{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap}
 .mi .ml{font-size:11px;color:var(--text-faint)}.mi .mv{font-size:14px;font-weight:600;color:var(--text)}
-.badge-premium{display:inline-flex;align-items:center;gap:5px;font:700 13px/1 var(--mono);padding:5px 11px;border-radius:100px;border:1px solid var(--border-strong)}
-.badge-premium.up{color:var(--neon);background:rgba(159,232,112,.10)}
-.badge-premium.down{color:var(--danger);background:rgba(255,107,107,.10)}
 .tax-badge{display:inline-flex;align-items:center;font:700 12px/1 var(--mono);padding:4px 9px;border-radius:100px;border:1px solid var(--border-strong);white-space:nowrap;color:var(--text-dim)}
 .tax-badge.lo{color:var(--warn);background:rgba(255,184,77,.10);border-color:rgba(255,184,77,.35)}
 .tax-badge.hi{color:var(--danger);background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.4)}
@@ -63,24 +60,24 @@ body{min-height:100vh;background:radial-gradient(ellipse 1200px 600px at 50% -20
 .ir{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.ir:last-child{margin-bottom:0}
 .il{font-size:12px;color:var(--text-faint);display:block;margin-bottom:4px}
 .ifl{width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border-strong);background:var(--bg-2);color:var(--neon);font-size:20px;font-weight:700;font-family:var(--mono);transition:.2s}
-.ifl:focus{outline:none;border-color:var(--neon);box-shadow:0 0 0 3px rgba(159,232,112,.12)}
+.ifl:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,197,71,.16)}
 .ifl::placeholder{color:var(--text-faint);font-weight:400}
 .btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border-strong);background:rgba(5,8,5,.8);color:var(--neon);cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:.2s}
-.btn:hover{background:var(--bg-card-2);border-color:var(--neon)}.btn:disabled{opacity:.5;cursor:default}
+.btn:hover{background:var(--bg-card-2);border-color:var(--gold)}.btn:disabled{opacity:.5;cursor:default}
 .br{padding:8px 20px;border-radius:8px;border:none;background:var(--neon);color:var(--bg-0);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:.2s}
 .br:hover{opacity:.85}.br:disabled{background:var(--bg-card-2);color:var(--text-faint);cursor:default;opacity:.5}
 .bc{padding:8px 14px;border-radius:8px;border:1px solid #7f1d1d;background:0 0;color:var(--danger);font-size:13px;cursor:pointer;font-family:inherit}
 .chain-toggle{display:inline-flex;gap:2px;background:var(--bg-2);border:1px solid var(--border);border-radius:8px;padding:2px}
 .chain-toggle button{padding:5px 12px;border:none;background:0 0;color:var(--text-dim);font:700 12px/1 inherit;border-radius:6px;cursor:pointer;transition:.15s}
 .chain-toggle button.on{background:var(--neon);color:var(--bg-0)}
-.sb{background:var(--bg-card);border-radius:14px;padding:16px 24px;margin-top:12px;margin-bottom:12px;border:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center}
+.sb{background:var(--bg-card);border-radius:14px;padding:16px 24px;margin-top:12px;margin-bottom:12px;border:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center;box-shadow:0 0 16px rgba(232,197,71,.07)}
 .sl{font-size:11px;color:var(--text-faint)}.svl{font-size:15px;font-weight:700;font-family:var(--mono)}
 table{width:100%;border-collapse:collapse;font-size:11px}
 thead tr{background:var(--bg-card-2)}
 th{padding:8px 5px;color:var(--text-faint);font-weight:600;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;font-size:10px}
-td{padding:7px 5px;text-align:center;border-bottom:1px solid rgba(159,232,112,.05);font-family:var(--mono);font-size:11px}
+td{padding:7px 5px;text-align:center;border-bottom:1px solid rgba(232,197,71,.10);font-family:var(--mono);font-size:11px}
 tr:hover td{background:rgba(159,232,112,.03)}
-.coin-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(159,232,112,.06)}
+.coin-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(232,197,71,.10)}
 .coin-row:last-child{border-bottom:none}
 .coin-left{display:flex;align-items:center;gap:8px}
 .coin-icon{font-size:20px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -102,13 +99,24 @@ tr:hover td{background:rgba(159,232,112,.03)}
 .mono{font-family:var(--mono)}.fw7{font-weight:700}
 .cg{color:var(--neon)}.cr{color:var(--danger)}.co{color:var(--warn)}.cgl{color:var(--gold)}.ca{color:var(--neon-bright)}.cdm{color:var(--text-dim)}
 .hd-right{display:flex;align-items:center;gap:14px}
-.rebase-box{display:flex;flex-direction:column;gap:7px;padding:11px 16px;border:1px solid var(--border-strong);border-radius:12px;background:rgba(159,232,112,.06);box-shadow:0 0 24px rgba(159,232,112,.06)}
+.rebase-box{display:flex;flex-direction:column;gap:7px;padding:11px 16px;border:1px solid var(--border-strong);border-radius:12px;background:rgba(232,197,71,.06);box-shadow:0 0 24px rgba(232,197,71,.10)}
 .rb-item{display:flex;align-items:baseline;justify-content:space-between;gap:24px}
 .rb-lab{font-size:12.5px;font-weight:600;color:var(--text-dim);white-space:nowrap}
 .rb-val{font-family:var(--mono);font-weight:800;font-size:21px;font-variant-numeric:tabular-nums;line-height:1.15;white-space:nowrap}
 .rb-val.cd{color:var(--info);text-shadow:0 0 14px rgba(127,212,232,.3)}
 .rb-val.rate{color:var(--neon);text-shadow:0 0 16px rgba(159,232,112,.4)}
-@media(max-width:640px){.g2{grid-template-columns:1fr}.sb{grid-template-columns:repeat(2,1fr)}.pv{font-size:28px}.calc-big{font-size:24px}.wrap{padding:12px 14px 64px}.hdi{padding:0 14px}.hd-right{width:100%}.rebase-box{flex:1}}
+.rb-val.prem{color:var(--text-dim)}
+.rb-val.prem.up{color:var(--neon);text-shadow:0 0 16px rgba(159,232,112,.4)}
+.rb-val.prem.down{color:var(--danger);text-shadow:0 0 16px rgba(255,107,107,.35)}
+/* ── nyx 시그니처 — 로즈→골드 시머 그라데이션 + 이중 발광 (가독성: mono 800) ── */
+.nyx-sig{font-family:var(--mono);font-weight:800;letter-spacing:.06em;text-shadow:none;
+  background:linear-gradient(100deg,#FF4D6D 0%,#FFB84D 42%,#FFF3C4 50%,#FFB84D 58%,#FF4D6D 100%);
+  background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:nyxShine 3.2s linear infinite;
+  filter:drop-shadow(0 0 5px rgba(255,77,109,.85)) drop-shadow(0 0 13px rgba(255,170,80,.45))}
+@keyframes nyxShine{to{background-position:-220% 0}}
+@media (prefers-reduced-motion:reduce){.nyx-sig{animation:none}}
+@media(max-width:640px){.g2{grid-template-columns:1fr}.sb{grid-template-columns:repeat(2,1fr)}.pv{font-size:28px}.calc-big{font-size:24px}.wrap{padding:12px 14px 64px}.hdi{padding:0 14px}.hd-right{width:100%;flex-wrap:wrap}.rebase-box{flex:1}}
 </style>
 <link rel="stylesheet" href="assets/shell.css">
 <link rel="manifest" href="manifest.json">
@@ -125,10 +133,13 @@ tr:hover td{background:rgba(159,232,112,.03)}
 <div class="hd"><div class="hdi">
   <div class="hdt">
     <div>
-      <div class="logo-wrap"><div class="logo"><img class="brand-sym" src="assets/symbol.png" alt=""> Origin LGNS<span style="font-family:var(--mono);font-weight:800;font-size:.5em;letter-spacing:.03em;color:#FF2E2E;text-shadow:0 0 6px rgba(255,46,46,.9),0 0 13px rgba(255,46,46,.5);vertical-align:super;margin-left:.16em">nxy</span></div></div>
+      <div class="logo-wrap"><div class="logo"><img class="brand-sym" src="assets/symbol.png" alt=""> Origin LGNS<span class="nyx-sig" style="font-size:.56em;vertical-align:super;margin-left:.18em">nyx</span></div></div>
       <div class="sts"><span class="pulse"></span>Polygon · Anubis · 업비트 · 빗썸 · CoinGecko · 30초 · <span style="color:var(--neon)" id="lastU">로딩중...</span> <span style="color:var(--neon)" id="cd"></span></div>
     </div>
     <div class="hd-right">
+      <div class="rebase-box" style="align-self:stretch;justify-content:center">
+        <div class="rb-item"><span class="rb-lab">폴리곤 대비 격차</span><span class="rb-val prem" id="prem">—</span></div>
+      </div>
       <div class="rebase-box">
         <div class="rb-item"><span class="rb-lab">다음 리베이스까지</span><span class="rb-val cd" id="rbCd">—</span></div>
         <div class="rb-item"><span class="rb-lab">리베이스 / 에폭</span><span class="rb-val rate" id="rbRate">—</span></div>
@@ -159,7 +170,7 @@ tr:hover td{background:rgba(159,232,112,.03)}
     </div>
     <div class="price-hero" style="margin-bottom:0">
       <div class="hero-tag">𓁢 Anubis · LGNS / USD</div>
-      <div class="pm"><div class="pv" id="anuP">—</div><span class="badge-premium" id="prem">—</span><span class="tax-badge" id="anuTax">매도세 —</span></div>
+      <div class="pm"><div class="pv" id="anuP">—</div><div><span class="pc" id="anuC">—</span> <span style="font-size:11px;color:var(--text-faint)">24h</span></div><span class="tax-badge" id="anuTax">매도세 —</span></div>
       <div class="pmt">
         <div class="mi"><div class="ml">LGNS 풀</div><div class="mv" id="anuR0">—</div></div>
         <div class="mi"><div class="ml">DAI 풀</div><div class="mv" id="anuR1">—</div></div>
@@ -325,7 +336,7 @@ tr:hover td{background:rgba(159,232,112,.03)}
         live prices, multi-wallet on-chain holdings, staking yields, and personal records, all in one place.
       </p>
       <div style="border-top:1px solid var(--border);margin:14px 0;padding-top:12px;font-size:12px;color:var(--text-faint);line-height:1.9">
-        <div>Crafted by <b style="color:var(--text-dim)">SpaceEchoBoy</b> · <span style="color:#FF2E2E;text-shadow:0 0 6px rgba(255,46,46,.7);font-weight:800">nxy</span></div>
+        <div>Crafted by <b style="color:var(--text-dim)">SpaceEchoBoy</b> · <span class="nyx-sig">nyx</span></div>
         <div>Data: public RPCs · DexScreener · Upbit · Bithumb · CoinGecko · DexTools</div>
         <div>On-chain &amp; read-only — no keys, no signing, no transactions.</div>
       </div>
@@ -411,6 +422,31 @@ async function fetchAnubis(){
   }catch(e){console.warn('anubis fetch',e);}
 }
 async function fetchAnuStats(){try{const r=await fetch(ANU_BS+'/stats');const j=await r.json();const c=parseFloat(j.coin_price);if(c)S.anu.native=c;}catch(e){}}
+
+// ── 아누비스 24h 변동 기준가 — DexScreener 등 무료 API가 Anubis 체인 미지원(실측: 빈 배열).
+//    아카이브 RPC로 '24h 전 블록'의 getReserves를 직접 읽는다(현재가와 동일 소스 = LP 리저브 직독).
+let anuBase=null; // {price, ts(기준 블록 실제시각), at(수집시각)}
+async function anuRpc(method,params){const r=await fetch(ANU_RPC,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params})});const j=await r.json();if(j.error)throw new Error(JSON.stringify(j.error));return j.result;}
+async function fetchAnuBase(){
+  try{
+    const target=Math.floor(Date.now()/1000)-86400;
+    const latest=await anuRpc('eth_getBlockByNumber',['latest',false]);
+    const lNum=parseInt(latest.number,16), lTs=parseInt(latest.timestamp,16);
+    const pNum=Math.max(1,lNum-5000);
+    const probe=await anuRpc('eth_getBlockByNumber',['0x'+pNum.toString(16),false]);
+    let bt=(lTs-parseInt(probe.timestamp,16))/(lNum-pNum); if(!(bt>0.2&&bt<15))bt=3;
+    let est=Math.max(1,lNum-Math.round((lTs-target)/bt)), ts=null;
+    for(let i=0;i<3;i++){ // 추정 → 실제 timestamp 확인 → 오차 ±15분 이내까지 보정(최대 3회)
+      const b=await anuRpc('eth_getBlockByNumber',['0x'+est.toString(16),false]);
+      ts=parseInt(b.timestamp,16);
+      if(Math.abs(ts-target)<=900)break;
+      est=Math.max(1,est+Math.round((target-ts)/bt));
+    }
+    const hex=(await anuRpc('eth_call',[{to:ANU_POOL,data:'0x0902f1ac'},'0x'+est.toString(16)])).slice(2);
+    const r0=BigInt('0x'+hex.slice(0,64)),r1=BigInt('0x'+hex.slice(64,128));
+    if(r0>0n)anuBase={price:(Number(r1)/Number(r0))*1e-9,ts,at:Date.now()};
+  }catch(e){console.warn('anu 24h base',e);}
+}
 // (Polygon 차트도 DexTools 위젯으로 통일 — GeckoTerminal OHLCV 자체렌더 제거)
 
 // ── 리베이스 (Polygon Staking 온체인 · 발행권한/Treasury 제외) ──
@@ -491,8 +527,8 @@ function setTax(id,t){const el=$(id);if(!el)return;if(t==null){el.textContent='�
 function renderTax(){setTax('polyTax',S.poly.sellTax);setTax('anuTax',S.anu.sellTax);}
 
 let chartsMounted=false;
-const POLY_DEXT="https://www.dextools.io/widget-chart/en/polygon/pe-light/0x882df4b0fb50a229c3b4124eb18c759911485bfb?theme=dark&chartType=1&chartResolution=1&drawingToolbars=false";
-const ANU_DEXT="https://www.dextools.io/widget-chart/en/anubis/pe-light/0x32a4586797e3f561f41c0f47ca57ed08d64f3dc0?theme=dark&chartType=1&chartResolution=1&drawingToolbars=false";
+const POLY_DEXT="https://www.dextools.io/widget-chart/en/polygon/pe-light/0x882df4b0fb50a229c3b4124eb18c759911485bfb?theme=dark&chartType=1&chartResolution=15&drawingToolbars=false&chartInUsd=true";
+const ANU_DEXT="https://www.dextools.io/widget-chart/en/anubis/pe-light/0x32a4586797e3f561f41c0f47ca57ed08d64f3dc0?theme=dark&chartType=1&chartResolution=15&drawingToolbars=false&chartInUsd=true";
 function dextIframe(url,title){return '<iframe src="'+url+'" loading="lazy" style="width:100%;height:100%;border:0;display:block" title="'+title+'"></iframe>';}
 function mountCharts(){if(chartsMounted)return;chartsMounted=true;
   const p=$('polyChart'),a=$('anuChart');
@@ -506,8 +542,10 @@ function uD(){
   $('polyPoolL').textContent=S.poly.poolLgns!=null?fNum(S.poly.poolLgns)+' LGNS':'—';
   $('polyPoolD').textContent=S.poly.poolDai!=null?fNum(S.poly.poolDai)+' DAI':'—';
   $('anuP').textContent=S.anu.price?f$(S.anu.price):'—';
+  S.anu.ch24=(anuBase&&S.anu.price)?(S.anu.price/anuBase.price-1)*100:null;
+  const ac=$('anuC');ac.textContent=fP(S.anu.ch24);ac.style.color=fC(S.anu.ch24);
   const pr=premiumPct(S.poly.price,S.anu.price);const pe=$('prem');
-  if(pr==null){pe.textContent='—';pe.className='badge-premium';}else{pe.textContent='Polygon 대비 '+(pr>=0?'▲':'▼')+' '+fP(pr);pe.className='badge-premium '+(pr>=0?'up':'down');}
+  if(pr==null){pe.textContent='—';pe.className='rb-val prem';}else{pe.textContent=(pr>=0?'▲ ':'▼ ')+fP(pr);pe.className='rb-val prem '+(pr>=0?'up':'down');}
   $('anuR0').textContent=S.anu.poolLgns!=null?fNum(S.anu.poolLgns)+' LGNS':'—';
   $('anuR1').textContent=S.anu.poolDai!=null?fNum(S.anu.poolDai)+' DAI':'—';
   $('fxL').textContent=S.fx.live?fN(S.fx.live,0):'—';
@@ -761,6 +799,8 @@ setInterval(()=>{S.cd=Math.max(0,S.cd-1);if($('cd'))$('cd').textContent=`(${S.cd
 setInterval(go,30000);
 setInterval(tickRebase,1000);
 ld();rL();runSelfTests();go();setTimeout(mountCharts,1000);
+fetchAnuBase().then(uD);          // 기준가 도착 즉시 24h 변동률 반영
+setInterval(fetchAnuBase,600000); // 기준 시점(24h 전)이 흐르므로 10분마다 재측정
 </script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
 <div class="signature">SpaceEchoBoy</div>

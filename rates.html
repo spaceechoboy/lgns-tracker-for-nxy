@@ -14,7 +14,7 @@
 :root{
   --bg-0:#050805; --bg-1:#0a1109; --bg-2:#0f1a0e;
   --bg-card:#0e1610; --bg-card-2:#121f12;
-  --border:rgba(159,232,112,.18); --border-strong:rgba(159,232,112,.35);
+  --border:rgba(232,197,71,.32); --border-strong:rgba(232,197,71,.58);
   --neon:#9FE870; --neon-bright:#B5FF7D; --neon-dim:#6BB048;
   --text:#E8F5E0; --text-dim:#9CA89A; --text-faint:#6B7569;
   --danger:#FF6B6B; --warn:#FFB84D; --note:#6BB048; --gold:#E8C547; --info:#7FD4E8;
@@ -31,7 +31,7 @@ body{min-height:100vh;background:radial-gradient(ellipse 1200px 600px at 50% -20
 .br{padding:9px 18px;border-radius:9px;border:none;background:var(--neon);color:var(--bg-0);font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;transition:.2s}
 .br:hover{opacity:.85}.br:disabled{background:var(--bg-card-2);color:var(--text-faint);cursor:default;opacity:.6}
 .wrap{max-width:980px;margin:0 auto;padding:16px 20px 70px}
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 0 16px rgba(232,197,71,.07)}
 .ch{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:linear-gradient(135deg,rgba(159,232,112,.05),transparent 70%)}
 .ct{font-size:14px;font-weight:800;color:var(--text)}
 .cs{font-size:10.5px;color:var(--text-faint);margin-top:2px}
@@ -42,7 +42,7 @@ body{min-height:100vh;background:radial-gradient(ellipse 1200px 600px at 50% -20
 .bdg.hi{color:var(--danger);background:rgba(255,107,107,.12);border-color:rgba(255,107,107,.4)}
 .bdg.ok{color:var(--neon);background:rgba(159,232,112,.10)}
 /* ranking */
-.rk{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(159,232,112,.06)}
+.rk{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(232,197,71,.10)}
 .rk:last-child{border-bottom:none}
 .rkmed{font-size:22px;width:30px;text-align:center;flex-shrink:0}
 .rkmid{flex:1;min-width:0}
@@ -57,7 +57,7 @@ body{min-height:100vh;background:radial-gradient(ellipse 1200px 600px at 50% -20
 .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--neon-dim),var(--neon));border-radius:3px;transition:width .5s}
 .bar i.kill{background:var(--danger)}
 /* product rates */
-.prod{padding:11px 0;border-bottom:1px dashed rgba(159,232,112,.10)}
+.prod{padding:11px 0;border-bottom:1px dashed rgba(232,197,71,.14)}
 .prod:last-child{border-bottom:none}
 .prod-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
 .prod-t{font-size:13px;font-weight:800;color:var(--neon-bright)}
@@ -69,7 +69,7 @@ body{min-height:100vh;background:radial-gradient(ellipse 1200px 600px at 50% -20
 .rv .sub{font-size:10px;color:var(--text-faint);font-weight:400;margin-left:6px}
 .ev{background:none;border:none;cursor:pointer;font-size:12px;line-height:1;padding:0 3px;opacity:.7;vertical-align:middle}
 .ev:hover{opacity:1}
-.evrow{font-size:11.5px;color:var(--text-dim);font-family:var(--mono);padding:7px 9px;margin:3px 0 7px;line-height:1.65;background:rgba(159,232,112,.05);border-left:2px solid var(--neon);border-radius:6px}
+.evrow{font-size:11.5px;color:var(--text-dim);font-family:var(--mono);padding:7px 9px;margin:3px 0 7px;line-height:1.65;background:rgba(159,232,112,.05);border-left:2px solid var(--gold);border-radius:6px}
 .evrow .evb{color:var(--neon-bright);font-weight:700;margin-bottom:4px;font-size:12px}
 .evrow .evi{word-break:break-all;margin-top:2px}
 .evrow a{color:var(--neon-bright);text-decoration:none;border-bottom:1px solid var(--neon)}
